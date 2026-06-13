@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Indian Railway Train Enquiry</title>
+<style>
+:root {
+  --ir-blue: #0A2240;
+  --ir-orange: #FB8C00;
+  --ir-gold: #FFC72C;
+  --bg-light: #EFF3F8;
+  --text-dark: #111827;
+  --border: #D1D5DB;
+  --white: #FFFFFF;
+  --green: #059669;
+  --red: #DC2626;
+  --muted: #6B7280;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: var(--bg-light); color: var(--text-dark); padding-bottom: 4rem; font-size: 14px; }
+
+
+
+/* ── Header ── */
+/* header { background: var(--white); padding: 0.9rem 1.5rem; border-bottom: 4px solid var(--ir-orange); }
+.header-inner { max-width: 1320px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.brand { display: flex; align-items: center; gap: 14px; }
+
+/* IR Wheel Logo SVG container */
+/*.ir-logo { width: 52px; height: 52px; flex-shrink: 0; } */
+
+
+
+/* ── Header ── */
+header { background: var(--white); padding: 0.9rem 1.5rem; border-bottom: 4px solid var(--ir-orange); }
+.header-inner { max-width: 1320px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.brand { display: flex; align-items: center; gap: 14px; }
+
+/* Change this block to support standard image rendering */
+.ir-logo { 
+  width: 52px; 
+  height: 52px; 
+  flex-shrink: 0; 
+  object-fit: contain; /* Ensures your logo image doesn't stretch or distort */
+}
+
+
+
+.brand-text h1 { font-size: 1.35rem; color: var(--ir-blue); font-weight: 800; line-height: 1.1; }
+.brand-text p { font-size: 11px; color: var(--muted); margin-top: 3px; letter-spacing: 0.2px; }
+.header-tag { text-align: right; }
+.header-tag strong { display: block; font-size: 13px; color: var(--ir-blue); font-weight: 700; }
+.header-tag span { font-size: 11px; color: var(--muted); }
+
+/* ── Nav ── */
+nav { background: var(--ir-blue); position: sticky; top: 0; z-index: 200; }
+.nav-inner { max-width: 1320px; margin: 0 auto; display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.nav-inner::-webkit-scrollbar { display: none; }
+nav button { background: none; border: none; color: #C9D4E0; padding: 13px 18px; cursor: pointer; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.15s; border-bottom: 3px solid transparent; white-space: nowrap; flex-shrink: 0; }
+nav button:hover { color: #fff; background: rgba(255,255,255,0.07); }
+nav button.active { color: var(--ir-gold); border-bottom-color: var(--ir-gold); }
+
+/* ── Mobile menu toggle (hidden on desktop) ── */
+.menu-toggle { display: none; background: none; border: none; cursor: pointer; padding: 13px 16px; color: #fff; flex-shrink: 0; }
+.menu-toggle svg { display: block; }
+.nav-links { display: flex; }
+
+/* ── Hero ── */
+.hero { height: 110px; margin: 1rem 0; border-radius: 6px;
+  background: linear-gradient(rgba(10,34,64,0.78),rgba(10,34,64,0.78)),
+  url('https://images.unsplash.com/photo-1589793463357-5fb813435467?q=80&w=1200&auto=format&fit=crop') center/cover;
+  display: flex; align-items: center; justify-content: center; }
+.hero-text { color: #fff; text-align: center; padding: 0 1rem; }
+.hero-text h2 { font-size: 1.4rem; font-weight: 800; }
+.hero-text p { font-size: 11.5px; margin-top: 5px; color: var(--ir-gold); text-transform: uppercase; letter-spacing: 0.8px; }
+
+/* ── Main ── */
+main { max-width: 1320px; margin: 0 auto; padding: 0 1rem; }
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── Card ── */
+.card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 1.1rem; margin-bottom: 1rem; }
+.card h3 { color: var(--ir-blue); font-size: 14px; font-weight: 700; margin-bottom: 0.9rem; padding-bottom: 8px; border-bottom: 1px solid var(--bg-light); }
+
+/* ── Search row ── */
+.input-row { display: flex; gap: 8px; }
+.input-row input { flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid #9CA3AF; font-size: 14px; border-radius: 5px; outline: none; transition: border 0.15s; }
+.input-row input:focus { border-color: var(--ir-blue); }
+.input-row button { background: var(--ir-orange); color: #fff; border: none; padding: 0 1.2rem; font-weight: 700; font-size: 13px; cursor: pointer; border-radius: 5px; white-space: nowrap; transition: background 0.15s; height: 42px; }
+.input-row button:hover { background: #E07902; }
+.input-row button:active { background: #C56A00; }
+
+/* ── Masthead ── */
+.masthead { background: var(--ir-gold); border: 3px double #222; border-radius: 3px; padding: 1.2rem 1rem; text-align: center; margin-bottom: 1rem; }
+.masthead .sname { font-size: clamp(1.4rem, 5vw, 2.1rem); font-weight: 900; color: #111; letter-spacing: 1px; line-height: 1.15; word-break: break-word; }
+.masthead .scode { font-size: 11px; color: #333; margin-top: 6px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
+
+/* ── Specs grid ── */
+.specs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; margin-bottom: 1rem; }
+.spec { background: var(--white); border: 1px solid var(--border); border-left: 4px solid var(--ir-blue); padding: 9px 12px; border-radius: 3px; }
+.spec label { font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 3px; }
+.spec span { font-size: 13px; color: var(--text-dark); font-weight: 600; word-break: break-word; }
+
+/* ── Section title ── */
+.section-title { font-size: 12px; color: var(--ir-blue); font-weight: 700; margin: 1.2rem 0 7px; border-left: 4px solid var(--ir-orange); padding-left: 10px; text-transform: uppercase; letter-spacing: 0.3px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.count-badge { background: var(--ir-orange); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+
+/* ── Table wrapper ── */
+.tbl-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; background: var(--white); border: 1px solid var(--border); border-radius: 5px; max-height: 480px; overflow-y: auto; margin-bottom: 1rem; }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 500px; }
+thead th { background: #EEF2F7; color: var(--ir-blue); padding: 9px 11px; font-weight: 700; border-bottom: 2px solid var(--border); position: sticky; top: 0; z-index: 5; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; white-space: nowrap; }
+td { padding: 9px 11px; border-bottom: 1px solid #F0F0F0; color: #1F2937; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:nth-child(even) { background: #FAFBFC; }
+tr:hover { background: #FFF8EC; }
+.no-wrap { white-space: nowrap; }
+
+/* ── Inline elements ── */
+.train-num { color: var(--ir-blue); font-weight: 700; font-family: monospace; font-size: 12.5px; }
+.arr { color: var(--green); font-weight: 700; font-family: monospace; }
+.dep { color: var(--red); font-weight: 700; font-family: monospace; }
+.dist { font-weight: 600; }
+.view-btn { background: var(--ir-blue); color: #fff; border: none; padding: 5px 10px; cursor: pointer; font-size: 11px; font-weight: 700; border-radius: 3px; transition: background 0.15s; white-space: nowrap; }
+.view-btn:hover { background: #051830; }
+.src-badge { font-size: 10px; font-weight: 700; background: #EFF3F8; color: var(--ir-blue); border: 1px solid var(--border); border-radius: 3px; padding: 2px 5px; white-space: nowrap; display: inline-block; }
+
+/* ── Badges ── */
+.badge-row { display: flex; flex-wrap: wrap; gap: 4px; }
+.cls-badge { font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 3px; background: #F0F0F0; color: #6B7280; border: 1px solid var(--border); }
+.cls-badge.on { background: #D1FAE5; color: #065F46; border-color: #10B981; }
+.days-row { display: flex; gap: 4px; flex-wrap: wrap; }
+.day-chip { font-size: 10px; font-weight: 700; padding: 3px 6px; border-radius: 3px; }
+.day-chip.on { background: #D1FAE5; color: #065F46; border: 1px solid #10B981; }
+.day-chip.off { background: #F3F4F6; color: #9CA3AF; border: 1px solid var(--border); }
+
+/* ── Status grid ── */
+.status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 9px; margin-top: 1rem; }
+.status-node { background: #F9FAFB; border: 1px solid var(--border); border-left: 5px solid #9CA3AF; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; border-radius: 3px; }
+.status-node.ok { border-left-color: var(--green); background: #F0FBF6; }
+.status-node.fail { border-left-color: var(--red); background: #FFF5F5; }
+.status-node .lbl { font-size: 12px; font-weight: 700; color: var(--ir-blue); }
+.status-node .st { font-size: 10.5px; margin-top: 3px; }
+.status-node .ct { font-size: 20px; font-weight: 700; color: var(--ir-blue); min-width: 40px; text-align: right; }
+
+/* ── Train header ── */
+.train-header { background: var(--white); border: 1px solid var(--border); border-left: 5px solid var(--ir-orange); padding: 1rem 1.2rem; margin-bottom: 1rem; border-radius: 3px; }
+.train-header h2 { color: var(--ir-blue); font-size: clamp(1rem, 3.5vw, 1.2rem); font-weight: 700; word-break: break-word; }
+.train-header .sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+/* ── Stop dot ── */
+.stop-seq { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: #9CA3AF; color: #fff; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+.stop-src { background: var(--green); }
+.stop-dst { background: var(--red); }
+
+/* ── Empty / error ── */
+.empty { padding: 1.5rem; color: var(--muted); font-style: italic; text-align: center; background: var(--white); border: 1px dashed var(--border); border-radius: 4px; }
+.err-msg { color: var(--red); font-weight: 700; padding: 0.8rem 0; }
+
+/* ── About section on home ── */
+.about-banner { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 1.4rem; margin-bottom: 1rem; display: flex; gap: 1.5rem; align-items: flex-start; }
+.about-banner .icon-block { flex-shrink: 0; width: 56px; height: 56px; }
+.about-text h2 { color: var(--ir-blue); font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+.about-text p { font-size: 12.5px; color: #374151; line-height: 1.6; }
+.about-text ul { margin: 8px 0 0 1.1rem; font-size: 12.5px; color: #374151; line-height: 1.7; }
+
+/* ────────────────────────────────────────────
+   MOBILE RESPONSIVE
+──────────────────────────────────────────── */
+@media (max-width: 640px) {
+  header { padding: 0.7rem 1rem; }
+  .brand-text h1 { font-size: 1.05rem; }
+  .brand-text p { display: none; }
+  .header-tag { display: none; }
+  .ir-logo { width: 40px; height: 40px; }
+
+  nav button { padding: 11px 14px; font-size: 11px; }
+
+  main { padding: 0 0.75rem; }
+
+  .hero { height: 90px; margin: 0.75rem 0; }
+  .hero-text h2 { font-size: 1.1rem; }
+  .hero-text p { font-size: 10px; }
+
+  .card { padding: 0.9rem; }
+  .card h3 { font-size: 13px; }
+
+  .input-row { flex-direction: column; }
+  .input-row input { font-size: 16px; } /* prevent iOS zoom */
+  .input-row button { height: 44px; width: 100%; }
+
+  .specs-grid { grid-template-columns: 1fr 1fr; }
+  .spec { padding: 8px 10px; }
+  .spec label { font-size: 9px; }
+  .spec span { font-size: 12px; }
+
+  .masthead .sname { font-size: 1.35rem; }
+
+  .status-grid { grid-template-columns: 1fr; }
+
+  .about-banner { flex-direction: column; gap: 0.8rem; }
+  .about-banner .icon-block { width: 44px; height: 44px; }
+
+  table { font-size: 11.5px; }
+  thead th { font-size: 9px; padding: 8px 9px; }
+  td { padding: 8px 9px; }
+
+  .train-header { padding: 0.8rem 1rem; }
+
+  /* Swipe hint on mobile */
+  .tbl-wrap::before { content: '← Scroll table →'; display: block; font-size: 10px; color: var(--muted); text-align: center; padding: 4px; background: #F9FAFB; border-bottom: 1px solid var(--border); }
+}
+
+@media (max-width: 400px) {
+  .specs-grid { grid-template-columns: 1fr; }
+  .brand { gap: 10px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <!-- Indian Railway Wheel Logo (SVG) -->
+      <!-- <svg class="ir-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="Indian Railways Logo"> -->
+        <!-- Outer ring -->
+        <!-- <circle cx="50" cy="50" r="46" fill="none" stroke="#0A2240" stroke-width="5"/> -->
+        <!-- Inner hub -->
+        <!-- <circle cx="50" cy="50" r="10" fill="#0A2240"/>
+        <circle cx="50" cy="50" r="5" fill="#FFC72C"/> -->
+        <!-- 16 spokes -->
+        <!-- <g stroke="#0A2240" stroke-width="3" stroke-linecap="round">
+          <line x1="50" y1="40" x2="50" y2="8"/>
+          <line x1="50" y1="60" x2="50" y2="92"/>
+          <line x1="40" y1="50" x2="8"  y2="50"/>
+          <line x1="60" y1="50" x2="92" y2="50"/>
+          <line x1="42.9" y1="42.9" x2="19.4" y2="19.4"/>
+          <line x1="57.1" y1="57.1" x2="80.6" y2="80.6"/>
+          <line x1="57.1" y1="42.9" x2="80.6" y2="19.4"/>
+          <line x1="42.9" y1="57.1" x2="19.4" y2="80.6"/> -->
+          <!-- Half-spokes at 22.5° intervals -->
+          <!-- <line x1="46.2" y1="40.4" x2="35.4" y2="9.6"/>
+          <line x1="53.8" y1="59.6" x2="64.6" y2="90.4"/>
+          <line x1="59.6" y1="46.2" x2="90.4" y2="35.4"/>
+          <line x1="40.4" y1="53.8" x2="9.6"  y2="64.6"/>
+          <line x1="53.8" y1="40.4" x2="64.6" y2="9.6"/>
+          <line x1="46.2" y1="59.6" x2="35.4" y2="90.4"/>
+          <line x1="59.6" y1="53.8" x2="90.4" y2="64.6"/>
+          <line x1="40.4" y1="46.2" x2="9.6"  y2="35.4"/>
+        </g> -->
+        <!-- Rim detail ring -->
+        <!-- <circle cx="50" cy="50" r="38" fill="none" stroke="#FB8C00" stroke-width="2"/> -->
+        <!-- IR text -->
+        <!-- <text x="50" y="54" text-anchor="middle" font-family="Arial" font-weight="900" font-size="13" fill="#FB8C00">IR</text> -->
+      <!-- </svg> -->
+      <img class="ir-logo" src="IR.png" alt="Indian Railways Logo">
+
+      <!-- <img class="ir-logo" src="https://example.com/your-custom-logo.svg" alt="Indian Railways Logo"> -->
+      <div class="brand-text">
+        <h1>Indian Railways</h1>
+        <p>Train &amp; Station Enquiry Reference Portal</p>
+      </div>
+    </div>
+    <div class="header-tag">
+      <strong>Train Enquiry</strong>
+      <span>Station · Route · Timetable</span>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner" id="nav-links">
+    <button id="nav-home" class="active" onclick="switchPage('home')">Overview</button>
+    <button id="nav-stations" onclick="switchPage('stations')">Station Explorer</button>
+    <button id="nav-trains" onclick="switchPage('trains')">Train Enquiry</button>
+  </div>
+</nav>
+
+<main>
+  <div class="hero">
+    <div class="hero-text">
+      <h2>Train &amp; Station Reference Engine</h2>
+      <p>Search stations · View passing trains · Explore full route maps</p>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <section id="page-home" class="page active">
+    <div class="about-banner">
+      <div class="icon-block">
+        <!-- <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="46" fill="none" stroke="#0A2240" stroke-width="5"/>
+          <circle cx="50" cy="50" r="10" fill="#0A2240"/>
+          <circle cx="50" cy="50" r="5" fill="#FFC72C"/>
+          <g stroke="#0A2240" stroke-width="3" stroke-linecap="round">
+            <line x1="50" y1="40" x2="50" y2="8"/>
+            <line x1="50" y1="60" x2="50" y2="92"/>
+            <line x1="40" y1="50" x2="8" y2="50"/>
+            <line x1="60" y1="50" x2="92" y2="50"/>
+            <line x1="42.9" y1="42.9" x2="19.4" y2="19.4"/>
+            <line x1="57.1" y1="57.1" x2="80.6" y2="80.6"/>
+            <line x1="57.1" y1="42.9" x2="80.6" y2="19.4"/>
+            <line x1="42.9" y1="57.1" x2="19.4" y2="80.6"/>
+            <line x1="46.2" y1="40.4" x2="35.4" y2="9.6"/>
+            <line x1="53.8" y1="59.6" x2="64.6" y2="90.4"/>
+            <line x1="59.6" y1="46.2" x2="90.4" y2="35.4"/>
+            <line x1="40.4" y1="53.8" x2="9.6" y2="64.6"/>
+            <line x1="53.8" y1="40.4" x2="64.6" y2="9.6"/>
+            <line x1="46.2" y1="59.6" x2="35.4" y2="90.4"/>
+            <line x1="59.6" y1="53.8" x2="90.4" y2="64.6"/>
+            <line x1="40.4" y1="46.2" x2="9.6" y2="35.4"/>
+          </g>
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#FB8C00" stroke-width="2"/>
+          <text x="50" y="54" text-anchor="middle" font-family="Arial" font-weight="900" font-size="13" fill="#FB8C00">IR</text>
+        </svg> -->
+        <img src="IR.png" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;">
+      </div>
+      <div class="about-text">
+        <h2>Indian Railways Train &amp; Station Enquiry Portal</h2>
+        <p>This is an unofficial reference portal for exploring Indian Railways train schedules, station information, and route data. All data is sourced from publicly available JSON datasets.</p>
+        <ul>
+          <li><strong>Station Explorer</strong> — Search any station by code or name to view all passing trains, timings, and distances.</li>
+          <li><strong>Train Enquiry</strong> — Look up any train by number or name to see its full route, stop sequence, running days, and coach classes.</li>
+          <li>Data is cross-referenced across Express, Passenger, Superfast, and Master rosters for maximum coverage.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Loaded Data Files</h3>
+      <div class="status-grid" id="status-grid"></div>
+    </div>
+  </section>
+
+  <!-- STATIONS -->
+  <section id="page-stations" class="page">
+    <div class="card">
+      <h3>Station Explorer</h3>
+      <div class="input-row">
+        <input type="text" id="sta-input" placeholder="Station code or name (e.g. HWH, LTT, BDHL, Badhal)…" onkeydown="if(event.key==='Enter') execStation()">
+        <button onclick="execStation()">Search</button>
+      </div>
+    </div>
+    <div id="sta-out"></div>
+  </section>
+
+  <!-- TRAINS -->
+  <section id="page-trains" class="page">
+    <div class="card">
+      <h3>Train Enquiry</h3>
+      <div class="input-row">
+        <input type="text" id="trn-input" placeholder="Train number or name (e.g. 01101, 01007, 47154, VALLEY QUEEN)…" onkeydown="if(event.key==='Enter') execTrain()">
+        <button onclick="execTrain()">Search</button>
+      </div>
+    </div>
+    <div id="trn-out"></div>
+  </section>
+</main>
+
+<script>
+// ── DB ──────────────────────────────────────────────────────────────────────
+const db = { stations:[], schedules:[], trainsMaster:[], trainsExp:[], trainsPass:[], trainsSf:[] };
+const MANIFEST = [
+  { id:'stations',    file:'stations.json',    label:'stations',    desc:'Station Master (GeoJSON)' },
+  { id:'schedules',   file:'schedules.json',   label:'schedules',   desc:'Base Schedule / Timetable' },
+  { id:'trainsMaster',file:'trains.json',      label:'trains',      desc:'Train Roster (GeoJSON)' },
+  { id:'trainsExp',   file:'EXP-TRAINS.json',  label:'EXP-TRAINS',  desc:'Express Train Roster' },
+  { id:'trainsPass',  file:'PASS-TRAINS.json', label:'PASS-TRAINS', desc:'Passenger Train Roster' },
+  { id:'trainsSf',    file:'SF-TRAINS.json',   label:'SF-TRAINS',   desc:'Superfast Train Roster' }
+];
+
+function unwrap(j) {
+  if (!j) return [];
+  if (j.features && Array.isArray(j.features)) return j.features.map(f=>({...f.properties,_geo:f.geometry}));
+  if (j.root && Array.isArray(j.root)) return j.root;
+  if (Array.isArray(j)) return j;
+  return Object.values(j);
+}
+
+async function init() {
+  for (const m of MANIFEST) {
+    try {
+      const r = await fetch(m.file);
+      if (!r.ok) throw new Error('404');
+      db[m.id] = unwrap(await r.json());
+      renderStatus(m, true, db[m.id].length);
+    } catch {
+      renderStatus(m, false, 0);
+    }
+  }
+}
+
+function renderStatus(m, ok, n) {
+  const g = document.getElementById('status-grid');
+  const el = document.createElement('div');
+  el.className = `status-node ${ok?'ok':'fail'}`;
+  el.innerHTML = `
+    <div>
+      <div class="lbl">${m.label}</div>
+      <div class="st" style="color:${ok?'var(--green)':'var(--red)'}">${m.desc} · ${ok?'Loaded':'File not found'}</div>
+    </div>
+    <div class="ct">${ok?n.toLocaleString():'—'}</div>`;
+  g.appendChild(el);
+}
+
+// ── Utils ──────────────────────────────────────────────────────────────────
+const up = v => String(v||'').trim().toUpperCase();
+function san(v) {
+  const c = up(v);
+  if (!c||['NONE','NULL','N/A','UNDEFINED','SOURCE','--'].includes(c)) return '—';
+  return String(v).trim();
+}
+function fmtDist(v) {
+  if (v===undefined||v===null||v==='') return '—';
+  let s = up(String(v)).replace('KMS','').replace('KM','').trim();
+  if (!s||s==='0') return '0 km';
+  const n = parseFloat(s);
+  return isNaN(n) ? s+' km' : n.toLocaleString()+' km';
+}
+function fmtTime(v) {
+  const s = san(v);
+  if (s==='—') return s;
+  return s.replace(/^(\d{1,2}:\d{2}):\d{2}$/,'$1');
+}
+
+// ── Navigation ─────────────────────────────────────────────────────────────
+function switchPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('nav-'+id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Look-ups ───────────────────────────────────────────────────────────────
+function findStation(q) {
+  const t = up(q);
+  return db.stations.find(s=>up(s.code||s.station_code)===t || up(s.name||s.station_name).includes(t));
+}
+function stationNameFor(code) {
+  const m = db.stations.find(s=>up(s.code||s.station_code)===up(code));
+  return m ? san(m.name||m.station_name) : up(code);
+}
+function findAllTrainRecords(q) {
+  const t = up(q);
+  const pools = [
+    {arr:db.trainsSf,    src:'SF-TRAINS'},
+    {arr:db.trainsExp,   src:'EXP-TRAINS'},
+    {arr:db.trainsPass,  src:'PASS-TRAINS'},
+    {arr:db.trainsMaster,src:'trains.json'}
+  ];
+  const results=[], seen=new Set();
+  for (const {arr,src} of pools) {
+    for (const item of arr) {
+      const num=up(item.trainNumber||item.number||item.train_number||'');
+      const nm=up(item.trainName||item.name||'');
+      if (num===t||nm.includes(t)) {
+        const key=num||nm;
+        if (!seen.has(key)){ seen.add(key); results.push({...item,_src:src}); }
+      }
+    }
+  }
+  return results;
+}
+function parseStopName(raw) {
+  if (!raw) return {name:'',code:''};
+  const m = raw.match(/^(.+?)\s*-\s*([A-Z0-9]+)$/);
+  if (m) return {name:m[1].trim(),code:m[2].trim()};
+  return {name:raw.trim(),code:raw.trim()};
+}
+
+// ── STATION SEARCH ─────────────────────────────────────────────────────────
+function execStation() {
+  const q = document.getElementById('sta-input').value.trim();
+  const out = document.getElementById('sta-out');
+  out.innerHTML = '';
+  if (!q) return;
+  const st = findStation(q);
+  if (!st) {
+    out.innerHTML = `<p class="err-msg">No station found for "${q}". Try a station code (e.g. HWH) or part of the name.</p>`;
+    return;
+  }
+  const code = up(st.code||st.station_code||'');
+  const name = san(st.name||st.station_name);
+  const state= san(st.state);
+  const zone = san(st.zone);
+  const addr = san(st.address);
+  const geo  = st._geo;
+
+  const scheds = db.schedules.filter(s=>up(s.station_code||s.code||s.stationCode)===code);
+
+  const routeMatches = [];
+  for (const pool of [db.trainsExp,db.trainsPass,db.trainsSf]) {
+    for (const train of pool) {
+      if (!Array.isArray(train.trainRoute)) continue;
+      const stop = train.trainRoute.find(r=>{
+        const {code:rc} = parseStopName(r.stationName||'');
+        return up(rc)===code;
+      });
+      if (stop) routeMatches.push({train,stop});
+    }
+  }
+
+  const rows = scheds.map(s=>{
+    const tnum = up(s.train_number||s.trainNo||s.number||'');
+    const recs = findAllTrainRecords(tnum);
+    const r = recs[0];
+    const tname = r ? san(r.trainName||r.name) : san(s.train_name||s.trainName||'');
+    const ttype = r ? san(r.type||r.trainType) : '—';
+    const route = r ? san(r.route) : '—';
+    const zone2 = r ? san(r.zone) : '—';
+    let stopNum='—', stopDist='—';
+    if (r && Array.isArray(r.trainRoute)) {
+      const match = r.trainRoute.find(rt=>{
+        const {code:rc}=parseStopName(rt.stationName||'');
+        return up(rc)===code;
+      });
+      if (match) { stopNum=san(match.sno||match.sequence); stopDist=fmtDist(match.distance); }
+    }
+    return {tnum,tname,ttype,route,zone:zone2,arrival:s.arrival,departure:s.departure,day:s.day,stopNum,stopDist,sources:r?[r._src]:[]};
+  });
+
+  const inSch = new Set(rows.map(r=>r.tnum));
+  for (const {train,stop} of routeMatches) {
+    const tnum = up(train.trainNumber||'');
+    if (!inSch.has(tnum)) {
+      inSch.add(tnum);
+      rows.push({tnum,tname:san(train.trainName),ttype:'—',route:san(train.route),zone:san(train.zone),
+        arrival:stop.arrives,departure:stop.departs,day:stop.day||'—',
+        stopNum:san(stop.sno),stopDist:fmtDist(stop.distance),sources:[train._src||'EXP/PASS/SF']});
+    }
+  }
+
+  rows.sort((a,b)=>{
+    const ta=a.departure&&a.departure!=='—'?a.departure:'99:99';
+    const tb=b.departure&&b.departure!=='—'?b.departure:'99:99';
+    return ta.localeCompare(tb);
+  });
+
+  let html = `
+    <div class="masthead">
+      <div class="sname">${name}</div>
+      <div class="scode">Station Code: ${code}</div>
+    </div>
+    <div class="section-title">Station Details</div>
+    <div class="specs-grid">
+      <div class="spec"><label>Code</label><span>${code}</span></div>
+      <div class="spec"><label>Name</label><span>${name}</span></div>
+      <div class="spec"><label>State</label><span>${state}</span></div>
+      <div class="spec"><label>Railway Zone</label><span>${zone}</span></div>
+      <div class="spec"><label>Address / Area</label><span>${addr}</span></div>`;
+  if (geo && geo.coordinates) {
+    const [lon,lat] = geo.coordinates;
+    html += `<div class="spec"><label>Coordinates</label><span>${lat.toFixed(5)}, ${lon.toFixed(5)}</span></div>`;
+  }
+  html += `</div>`;
+
+  if (rows.length > 0) {
+    html += `
+    <div class="section-title">Trains Passing Through <span class="count-badge">${rows.length} services</span></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr>
+        <th>#</th><th>Train No.</th><th>Train Name</th><th>Type</th><th>Zone</th>
+        <th>Route</th><th>Arrival</th><th>Departure</th>
+        <th>Stop #</th><th>Distance</th><th>Day</th><th>Source</th><th></th>
+      </tr></thead>
+      <tbody>`;
+    rows.forEach((r,i)=>{
+      const src = r.sources.length ? r.sources.map(s=>
+      {
+        const cleanLabel = s.replace(/\.json$/i, ''); 
+        return `<span class="src-badge">${cleanLabel}</span>`;
+      }
+    //   `<span class="src-badge">${s}</span>`
+    ).join(' ') : `<span class="src-badge">schedules</span>`;
+      html += `<tr>
+        <td>${i+1}</td>
+        <td class="no-wrap"><span class="train-num">${r.tnum||'—'}</span></td>
+        <td>${r.tname||'—'}</td>
+        <td>${r.ttype||'—'}</td>
+        <td>${r.zone||'—'}</td>
+        <td style="font-size:11.5px;max-width:180px;">${r.route||'—'}</td>
+        <td class="no-wrap"><span class="arr">${fmtTime(r.arrival)}</span></td>
+        <td class="no-wrap"><span class="dep">${fmtTime(r.departure)}</span></td>
+        <td style="text-align:center;">${r.stopNum||'—'}</td>
+        <td class="no-wrap dist">${r.stopDist||'—'}</td>
+        <td style="text-align:center;">${san(r.day)}</td>
+        <td class="no-wrap">${src}</td>
+        <td><button class="view-btn" onclick="goTrain('${r.tnum}')">Route ›</button></td>
+      </tr>`;
+    });
+    html += `</tbody></table></div>`;
+  } else {
+    html += `<div class="empty">No train services found passing through station <strong>${code}</strong> in any loaded file.</div>`;
+  }
+  out.innerHTML = html;
+}
+
+// ── TRAIN SEARCH ───────────────────────────────────────────────────────────
+function execTrain() {
+  const q = document.getElementById('trn-input').value.trim();
+  const out = document.getElementById('trn-out');
+  out.innerHTML = '';
+  if (!q) return;
+
+  const recs = findAllTrainRecords(q);
+  const qUp  = up(q);
+  const schedRows = db.schedules.filter(s=>up(s.train_number||s.trainNo||s.number||'')===qUp);
+
+  if (recs.length===0 && schedRows.length===0) {
+    out.innerHTML = `<p class="err-msg">No train found for "${q}". Try a train number (e.g. 01101) or part of the name.</p>`;
+    return;
+  }
+
+  const primary = recs[0]||{};
+  const trainNum  = san(primary.trainNumber||primary.number||primary.train_number||q);
+  const trainName = san(primary.trainName||primary.name||schedRows[0]?.train_name||'Scheduled Service');
+
+  let unifiedStops = [], stopSources = [];
+  const rosterRec = recs.find(r=>Array.isArray(r.trainRoute)&&r.trainRoute.length>0);
+  if (rosterRec) {
+    stopSources.push(rosterRec._src||'Roster');
+    unifiedStops = rosterRec.trainRoute.map((st,idx)=>{
+      const {name:sname,code:scode} = parseStopName(st.stationName||'');
+      return {sno:parseInt(st.sno||st.sequence||idx+1),code:scode,
+              name:sname||stationNameFor(scode),arrives:st.arrives,departs:st.departs,
+              distance:st.distance,day:st.day};
+    });
+  }
+  if (schedRows.length>0 && unifiedStops.length===0) {
+    stopSources.push('schedules');
+    unifiedStops = schedRows
+      .sort((a,b)=>(parseInt(a.day||0))-(parseInt(b.day||0)))
+      .map((s,idx)=>({sno:parseInt(s.day||s.stop_number||s.sequence||idx+1),
+        code:up(s.station_code||s.stationCode||''),
+        name:san(s.station_name||s.stationName||stationNameFor(s.station_code)),
+        arrives:s.arrival,departs:s.departure,distance:s.distance||'0',day:s.day}));
+  }
+  unifiedStops.sort((a,b)=>a.sno-b.sno);
+
+  const fromRec = recs.find(r=>r.from_station_name||r.route);
+  const toRec   = recs.find(r=>r.to_station_name);
+  let fromStation = san(fromRec?.from_station_name||fromRec?.route?.split(' to ')[0]||(unifiedStops[0]?.name||''));
+  let toStation   = san(toRec?.to_station_name||fromRec?.route?.split(' to ')[1]||(unifiedStops[unifiedStops.length-1]?.name||''));
+  let distance    = fromRec?.distance ? fromRec.distance+' km' : '—';
+  let zone        = san(primary.zone);
+  let trainType   = san(primary.type||primary.trainType);
+  let returnTrain = san(primary.return_train||primary.returnTrain);
+  let durationStr = primary.duration_h!==undefined ? `${primary.duration_h}h ${primary.duration_m||0}m` : '—';
+
+  const anyRec = recs.find(r=>r.first_ac!==undefined)||{};
+  const cls = {'1AC':!!anyRec.first_ac,'2AC':!!anyRec.second_ac,'3AC':!!anyRec.third_ac,
+               'SL':!!anyRec.sleeper,'CC':!!anyRec.chair_car,'FC':!!anyRec.first_class};
+  const daysRec = recs.find(r=>r.runningDays)||{};
+  const rd = daysRec.runningDays||{};
+  const DAY_ORDER = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+
+  let html = `
+    <div class="train-header">
+      <h2>[${trainNum}] ${trainName}</h2>
+      <div class="sub">Data sources: ${stopSources.join(', ')||'—'}</div>
+    </div>
+    <div class="section-title">Train Details</div>
+    <div class="specs-grid">
+      <div class="spec"><label>Train Number</label><span>${trainNum}</span></div>
+      <div class="spec"><label>Train Name</label><span>${trainName}</span></div>
+      <div class="spec"><label>From Station</label><span>${fromStation}</span></div>
+      <div class="spec"><label>To Station</label><span>${toStation}</span></div>
+      <div class="spec"><label>Total Distance</label><span>${distance}</span></div>
+      <div class="spec"><label>Journey Duration</label><span>${durationStr}</span></div>
+      <div class="spec"><label>Railway Zone</label><span>${zone}</span></div>
+      <div class="spec"><label>Train Type</label><span>${trainType}</span></div>
+      <div class="spec"><label>Return Train No.</label><span>${returnTrain}</span></div>
+      <div class="spec">
+        <label>Coach Classes</label>
+        <div class="badge-row" style="margin-top:5px;">
+          ${Object.entries(cls).map(([k,v])=>`<span class="cls-badge ${v?'on':''}">${k}</span>`).join('')}
+        </div>
+      </div>`;
+
+  if (Object.keys(rd).length>0) {
+    html += `
+      <div class="spec">
+        <label>Running Days</label>
+        <div class="days-row" style="margin-top:5px;">
+          ${DAY_ORDER.map(d=>`<span class="day-chip ${rd[d]?'on':'off'}">${d}</span>`).join('')}
+        </div>
+      </div>`;
+  }
+  html += `</div>`;
+
+  if (recs.length>1) {
+    html += `<div class="section-title">Matched Records <span class="count-badge">${recs.length} sources</span></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>#</th><th>Source</th><th>Train No</th><th>Train Name</th><th>Route</th><th>Zone</th><th>Type</th><th>Running Days</th></tr></thead>
+      <tbody>`;
+    recs.forEach((r,i)=>{
+      const rdays = r.runningDays ? DAY_ORDER.filter(d=>r.runningDays[d]).join(', ')||'—' : '—';
+
+      // Strips .json from trains.json while keeping EXP-TRAINS/SF-TRAINS untouched
+        const cleanSrc = (r._src || '').replace(/\.json$/i, '');
+
+      html += `<tr>
+        <td>${i+1}</td>
+        <!--<td><span class="src-badge">${r._src}</span></td>-->
+        <td><span class="src-badge">${cleanSrc}</span></td>
+        <td class="no-wrap"><span class="train-num">${san(r.trainNumber||r.number||r.train_number)}</span></td>
+        <td>${san(r.trainName||r.name)}</td>
+        <td style="font-size:11.5px;">${san(r.route||`${r.from_station_name||''} → ${r.to_station_name||''}`)}</td>
+        <td>${san(r.zone)}</td>
+        <td>${san(r.type||r.trainType)}</td>
+        <td style="font-size:11.5px;">${rdays}</td>
+      </tr>`;
+    });
+    html += `</tbody></table></div>`;
+  }
+
+  if (unifiedStops.length>0) {
+    const total = unifiedStops.length;
+    html += `
+    <div class="section-title">Route Stop Sequence <span class="count-badge">${total} stops</span></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr>
+        <th>#</th><th>Stop</th><th>Code</th><th>Station Name</th>
+        <th>Arrives</th><th>Departs</th><th>Distance</th><th>Day</th>
+      </tr></thead>
+      <tbody>`;
+    unifiedStops.forEach((s,i)=>{
+      const isFirst=i===0, isLast=i===total-1;
+      const dotCls = isFirst?'stop-src':isLast?'stop-dst':'';
+      const fullName = stationNameFor(s.code)!==s.code ? stationNameFor(s.code) : s.name;
+      const arrCell = isFirst ? `<span style="color:var(--green);font-weight:700;">Source</span>` : `<span class="arr">${fmtTime(s.arrives)}</span>`;
+      const depCell = isLast  ? `<span style="color:var(--red);font-weight:700;">Terminus</span>` : `<span class="dep">${fmtTime(s.departs)}</span>`;
+      html += `<tr>
+        <td>${i+1}</td>
+        <td style="text-align:center;"><span class="stop-seq ${dotCls}">${s.sno}</span></td>
+        <td><span class="train-num">${s.code||'—'}</span></td>
+        <td style="font-weight:600;">${san(fullName)}</td>
+        <td class="no-wrap">${arrCell}</td>
+        <td class="no-wrap">${depCell}</td>
+        <td class="no-wrap dist">${fmtDist(s.distance)}</td>
+        <td style="text-align:center;">${san(s.day)}</td>
+      </tr>`;
+    });
+    html += `</tbody></table></div>`;
+  } else {
+    html += `<div class="empty">No stop sequence data found in any loaded file for this train.</div>`;
+  }
+
+  out.innerHTML = html;
+}
+
+function goTrain(num) {
+  document.getElementById('trn-input').value = num;
+  switchPage('trains');
+  execTrain();
+}
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
