@@ -1248,7 +1248,11 @@ function execStation() {
         const {code:rc} = parseStopName(rt.stationName||'');
         return rc && up(rc)===code;  // BUG 1 FIX: require rc to be non-empty
       });
-      if (match) { stopNum=san(match.sno||match.sequence); stopDist=fmtDist(match.distance); }
+      
+      // if (match) { stopNum=san(match.sno||match.sequence); stopDist=fmtDist(match.distance); }
+      if (!match) return null;
+      stopNum = san(match.sno||match.sequence);
+      stopDist = fmtDist(match.distance);
     }
     return {tnum,tname,ttype,route,zone:zone2,arrival:s.arrival,departure:s.departure,
             day:s.day,stopNum,stopDist,sources:r?[r._src]:['schedules']};
