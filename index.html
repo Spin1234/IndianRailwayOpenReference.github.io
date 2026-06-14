@@ -40,7 +40,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
   pointer-events: none;
 }
 
-.loader-box {
+/* .loader-box {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -48,16 +48,56 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
   padding: 2rem 2.5rem;
   width: 100%;
   max-width: 360px;
+} */
+
+/* ── Train track animation ── */
+.loader-track-wrap {
+  width: 220px;
+  height: 36px;
+  position: relative;
+  margin-bottom: 4px;
+  overflow: hidden;
+}
+.loader-track-rail {
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: repeating-linear-gradient(
+    90deg,
+    #2A4A6A 0px, #2A4A6A 18px,
+    transparent 18px, transparent 26px
+  );
+}
+.loader-track-rail.top    { top: 8px; }
+.loader-track-rail.bottom { bottom: 8px; }
+.loader-train-icon {
+  position: absolute;
+  font-size: 26px;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: train-move 2s ease-in-out infinite;
+  filter: drop-shadow(2px 0 6px rgba(251,140,0,0.5));
+}
+@keyframes train-move {
+  0%   { left: -40px; }
+  100% { left: 230px; }
 }
 
-/* Spinning wheel */
-.loader-wheel {
-  width: 72px;
-  height: 72px;
-  animation: wheel-spin 1.2s linear infinite;
-  filter: drop-shadow(0 0 10px rgba(251,140,0,0.4));
+/* ── Loader box polish ── */
+.loader-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 2.2rem 2.8rem;
+  width: 100%;
+  max-width: 380px;
+  background: rgba(6, 16, 28, 0.92);
+  border: 1px solid rgba(251,140,0,0.2);
+  border-radius: 12px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
+  backdrop-filter: blur(6px);
 }
-@keyframes wheel-spin { to { transform: rotate(360deg); } }
 
 .loader-title {
   color: #ffffff;
@@ -338,31 +378,13 @@ tr:hover { background: #FFF8EC; }
 
 <div id="ir-loader">
   <div class="loader-box">
-    <svg class="loader-wheel" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="50" cy="50" r="46" fill="none" stroke="#1a3a5c" stroke-width="5"/>
-      <circle cx="50" cy="50" r="10" fill="#1a3a5c"/>
-      <circle cx="50" cy="50" r="5" fill="#FFC72C"/>
-      <g stroke="#1a3a5c" stroke-width="3" stroke-linecap="round">
-        <line x1="50" y1="40" x2="50" y2="8"/>
-        <line x1="50" y1="60" x2="50" y2="92"/>
-        <line x1="40" y1="50" x2="8" y2="50"/>
-        <line x1="60" y1="50" x2="92" y2="50"/>
-        <line x1="42.9" y1="42.9" x2="19.4" y2="19.4"/>
-        <line x1="57.1" y1="57.1" x2="80.6" y2="80.6"/>
-        <line x1="57.1" y1="42.9" x2="80.6" y2="19.4"/>
-        <line x1="42.9" y1="57.1" x2="19.4" y2="80.6"/>
-        <line x1="46.2" y1="40.4" x2="35.4" y2="9.6"/>
-        <line x1="53.8" y1="59.6" x2="64.6" y2="90.4"/>
-        <line x1="59.6" y1="46.2" x2="90.4" y2="35.4"/>
-        <line x1="40.4" y1="53.8" x2="9.6" y2="64.6"/>
-        <line x1="53.8" y1="40.4" x2="64.6" y2="9.6"/>
-        <line x1="46.2" y1="59.6" x2="35.4" y2="90.4"/>
-        <line x1="59.6" y1="53.8" x2="90.4" y2="64.6"/>
-        <line x1="40.4" y1="46.2" x2="9.6" y2="35.4"/>
-      </g>
-      <circle cx="50" cy="50" r="38" fill="none" stroke="#FB8C00" stroke-width="2"/>
-    </svg>
+    
 
+    <div class="loader-track-wrap">
+  <div class="loader-track-rail top"></div>
+  <div class="loader-track-rail bottom"></div>
+  <div class="loader-train-icon">🚆</div>
+</div>
     <div class="loader-title">Indian Railways</div>
     <div class="loader-sub">Loading data, please wait…</div>
 
@@ -373,13 +395,13 @@ tr:hover { background: #FFF8EC; }
     <div class="loader-status" id="loader-status">Starting…</div>
 
     <div class="loader-file-list" id="loader-file-list">
-      <div class="lf-item" id="lf-stations">    <span class="lf-dot"></span> stations</div>
-      <div class="lf-item" id="lf-schedules">   <span class="lf-dot"></span> schedules</div>
-      <div class="lf-item" id="lf-trainsMaster"><span class="lf-dot"></span> trains</div>
-      <div class="lf-item" id="lf-trainsExp">   <span class="lf-dot"></span> EXP-TRAINS</div>
-      <div class="lf-item" id="lf-trainsPass">  <span class="lf-dot"></span> PASS-TRAINS</div>
-      <div class="lf-item" id="lf-trainsSf">    <span class="lf-dot"></span> SF-TRAINS</div>
-    </div>
+  <div class="lf-item" id="lf-stations">    <span class="lf-dot"></span> Station Master</div>
+  <div class="lf-item" id="lf-schedules">   <span class="lf-dot"></span> Timetable Schedule</div>
+  <div class="lf-item" id="lf-trainsMaster"><span class="lf-dot"></span> Train Roster</div>
+  <div class="lf-item" id="lf-trainsExp">   <span class="lf-dot"></span> Express Trains</div>
+  <div class="lf-item" id="lf-trainsPass">  <span class="lf-dot"></span> Passenger Trains</div>
+  <div class="lf-item" id="lf-trainsSf">    <span class="lf-dot"></span> Superfast Trains</div>
+</div>
   </div>
 </div>
 
@@ -573,10 +595,12 @@ async function init() {
     el.classList.remove('active', 'done', 'fail');
     el.classList.add(state);
     if (state === 'done' && count !== undefined) {
-      el.innerHTML = `<span class="lf-dot"></span> ${MANIFEST.find(m=>m.id===id)?.file} <span style="color:#6B7280;margin-left:4px;">(${count.toLocaleString()})</span>`;
+      // el.innerHTML = `<span class="lf-dot"></span> ${MANIFEST.find(m=>m.id===id)?.file} <span style="color:#6B7280;margin-left:4px;">(${count.toLocaleString()})</span>`;
+      el.innerHTML = `<span class="lf-dot"></span> ${MANIFEST.find(m=>m.id===id)?.label} <span style="color:#6B7280;margin-left:4px;">(${count.toLocaleString()})</span>`;
     }
     if (state === 'fail') {
-      el.innerHTML = `<span class="lf-dot"></span> ${MANIFEST.find(m=>m.id===id)?.file} <span style="color:#F87171;margin-left:4px;">— not found</span>`;
+      // el.innerHTML = `<span class="lf-dot"></span> ${MANIFEST.find(m=>m.id===id)?.file} <span style="color:#F87171;margin-left:4px;">— not found</span>`;
+      el.innerHTML = `<span class="lf-dot"></span> ${MANIFEST.find(m=>m.id===id)?.label} <span style="color:#F87171;margin-left:4px;">— not found</span>`;
     }
   }
 
