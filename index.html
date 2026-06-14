@@ -61,6 +61,41 @@ nav button { background: none; border: none; color: #C9D4E0; padding: 13px 18px;
 nav button:hover { color: #fff; background: rgba(255,255,255,0.07); }
 nav button.active { color: var(--ir-gold); border-bottom-color: var(--ir-gold); }
 
+
+/* ── Loading Banner ── */
+#load-banner {
+  background: #0A2240;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 9px 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  letter-spacing: 0.3px;
+  transition: opacity 0.4s ease;
+}
+#load-banner.hidden {
+  opacity: 0;
+  pointer-events: none;
+  height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.load-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #FFC72C;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+
+
 /* ── Mobile menu toggle (hidden on desktop) ── */
 .menu-toggle { display: none; background: none; border: none; cursor: pointer; padding: 13px 16px; color: #fff; flex-shrink: 0; }
 .menu-toggle svg { display: block; }
@@ -278,6 +313,11 @@ tr:hover { background: #FFF8EC; }
   </div>
 </nav>
 
+  <div id="load-banner">
+  <div class="load-spinner"></div>
+  <span id="load-msg">Loading data files… <strong id="load-count">0 / 6</strong></span>
+</div>
+
 <main>
   <div class="hero">
     <div class="hero-text">
@@ -379,7 +419,24 @@ function unwrap(j) {
   return Object.values(j);
 }
 
+// async function init() {
+//   for (const m of MANIFEST) {
+//     try {
+//       const r = await fetch(m.file);
+//       if (!r.ok) throw new Error('404');
+//       db[m.id] = unwrap(await r.json());
+//       renderStatus(m, true, db[m.id].length);
+//     } catch {
+//       renderStatus(m, false, 0);
+//     }
+//   }
+// }
+
+
 async function init() {
+  let loaded = 0;
+  const total = MANIFEST.length;
+
   for (const m of MANIFEST) {
     try {
       const r = await fetch(m.file);
@@ -389,8 +446,19 @@ async function init() {
     } catch {
       renderStatus(m, false, 0);
     }
+    loaded++;
+    document.getElementById('load-count').textContent = `${loaded} / ${total}`;
   }
+
+  // All done — update banner then fade out
+  const banner = document.getElementById('load-banner');
+  const msg = document.getElementById('load-msg');
+  msg.innerHTML = '✓ All data loaded. Ready to search.';
+  banner.style.background = '#065F46';  // green
+  setTimeout(() => banner.classList.add('hidden'), 1800);
 }
+
+
 
 function renderStatus(m, ok, n) {
   const g = document.getElementById('status-grid');
@@ -568,13 +636,14 @@ function execStation() {
       </tr></thead>
       <tbody>`;
     rows.forEach((r,i)=>{
-      const src = r.sources.length ? r.sources.map(s=>
-      {
-        const cleanLabel = s.replace(/\.json$/i, ''); 
-        return `<span class="src-badge">${cleanLabel}</span>`;
-      }
-    //   `<span class="src-badge">${s}</span>`
-    ).join(' ') : `<span class="src-badge">schedules</span>`;
+    //   const src = r.sources.length ? r.sources.map(s=>
+    //   {
+    //     const cleanLabel = s.replace(/\.json$/i, ''); 
+    //     return `<span class="src-badge">${cleanLabel}</span>`;
+    //   }
+    // //   `<span class="src-badge">${s}</span>`
+    // ).join(' ') : `<span class="src-badge">schedules</span>`;
+      const src = r.sources.length ? r.sources.map(s=>`<span class="src-badge">${s.replace(/\.json$/i, '')}</span>`).join(' ') : `<span class="src-badge">schedules</span>`;
       html += `<tr>
         <td>${i+1}</td>
         <td class="no-wrap"><span class="train-num">${r.tnum||'—'}</span></td>
