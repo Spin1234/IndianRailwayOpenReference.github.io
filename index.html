@@ -606,7 +606,7 @@ async function init() {
 
   for (const m of MANIFEST) {
     setFileState(m.id, 'active');
-    statusEl.textContent = `Loading ${m.file}…`;
+    statusEl.textContent = `Loading ${m.label}…`;
 
     try {
       const r = await fetch(m.file);
