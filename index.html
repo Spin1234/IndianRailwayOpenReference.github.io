@@ -22,6 +22,118 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
 
 
 
+/* ── Full-screen loader overlay ── */
+#ir-loader {
+  position: fixed;
+  inset: 0;
+  background: #06101C;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.5s ease;
+}
+#ir-loader.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loader-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 2rem 2.5rem;
+  width: 100%;
+  max-width: 360px;
+}
+
+/* Spinning wheel */
+.loader-wheel {
+  width: 72px;
+  height: 72px;
+  animation: wheel-spin 1.2s linear infinite;
+  filter: drop-shadow(0 0 10px rgba(251,140,0,0.4));
+}
+@keyframes wheel-spin { to { transform: rotate(360deg); } }
+
+.loader-title {
+  color: #ffffff;
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+.loader-sub {
+  color: #9CA3AF;
+  font-size: 12px;
+  margin-top: -6px;
+}
+
+/* Progress bar */
+.loader-bar-track {
+  width: 100%;
+  height: 5px;
+  background: #1E2F42;
+  border-radius: 99px;
+  overflow: hidden;
+}
+.loader-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #0A2240, #FB8C00);
+  border-radius: 99px;
+  transition: width 0.35s ease;
+}
+
+/* Status text */
+.loader-status {
+  color: #FFC72C;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-align: center;
+  min-height: 18px;
+  letter-spacing: 0.2px;
+}
+
+/* File checklist */
+.loader-file-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+.lf-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 11.5px;
+  color: #4B6580;
+  font-family: monospace;
+  transition: color 0.2s;
+}
+.lf-item.done  { color: #34D399; }
+.lf-item.fail  { color: #F87171; }
+.lf-item.active { color: #FFC72C; }
+
+.lf-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1E2F42;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+.lf-item.done  .lf-dot { background: #34D399; }
+.lf-item.fail  .lf-dot { background: #F87171; }
+.lf-item.active .lf-dot {
+  background: #FFC72C;
+  box-shadow: 0 0 6px #FFC72C;
+  animation: pulse-dot 0.8s ease infinite alternate;
+}
+@keyframes pulse-dot { to { transform: scale(1.5); } }
+
+
 /* ── Header ── */
 /* header { background: var(--white); padding: 0.9rem 1.5rem; border-bottom: 4px solid var(--ir-orange); }
 .header-inner { max-width: 1320px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
@@ -255,6 +367,54 @@ tr:hover { background: #FFF8EC; }
 </head>
 <body>
 
+
+<div id="ir-loader">
+  <div class="loader-box">
+    <svg class="loader-wheel" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="#1a3a5c" stroke-width="5"/>
+      <circle cx="50" cy="50" r="10" fill="#1a3a5c"/>
+      <circle cx="50" cy="50" r="5" fill="#FFC72C"/>
+      <g stroke="#1a3a5c" stroke-width="3" stroke-linecap="round">
+        <line x1="50" y1="40" x2="50" y2="8"/>
+        <line x1="50" y1="60" x2="50" y2="92"/>
+        <line x1="40" y1="50" x2="8" y2="50"/>
+        <line x1="60" y1="50" x2="92" y2="50"/>
+        <line x1="42.9" y1="42.9" x2="19.4" y2="19.4"/>
+        <line x1="57.1" y1="57.1" x2="80.6" y2="80.6"/>
+        <line x1="57.1" y1="42.9" x2="80.6" y2="19.4"/>
+        <line x1="42.9" y1="57.1" x2="19.4" y2="80.6"/>
+        <line x1="46.2" y1="40.4" x2="35.4" y2="9.6"/>
+        <line x1="53.8" y1="59.6" x2="64.6" y2="90.4"/>
+        <line x1="59.6" y1="46.2" x2="90.4" y2="35.4"/>
+        <line x1="40.4" y1="53.8" x2="9.6" y2="64.6"/>
+        <line x1="53.8" y1="40.4" x2="64.6" y2="9.6"/>
+        <line x1="46.2" y1="59.6" x2="35.4" y2="90.4"/>
+        <line x1="59.6" y1="53.8" x2="90.4" y2="64.6"/>
+        <line x1="40.4" y1="46.2" x2="9.6" y2="35.4"/>
+      </g>
+      <circle cx="50" cy="50" r="38" fill="none" stroke="#FB8C00" stroke-width="2"/>
+    </svg>
+
+    <div class="loader-title">Indian Railways</div>
+    <div class="loader-sub">Loading data, please wait…</div>
+
+    <div class="loader-bar-track">
+      <div class="loader-bar-fill" id="loader-bar-fill"></div>
+    </div>
+
+    <div class="loader-status" id="loader-status">Starting…</div>
+
+    <div class="loader-file-list" id="loader-file-list">
+      <div class="lf-item" id="lf-stations">    <span class="lf-dot"></span> stations.json</div>
+      <div class="lf-item" id="lf-schedules">   <span class="lf-dot"></span> schedules.json</div>
+      <div class="lf-item" id="lf-trainsMaster"><span class="lf-dot"></span> trains.json</div>
+      <div class="lf-item" id="lf-trainsExp">   <span class="lf-dot"></span> EXP-TRAINS.json</div>
+      <div class="lf-item" id="lf-trainsPass">  <span class="lf-dot"></span> PASS-TRAINS.json</div>
+      <div class="lf-item" id="lf-trainsSf">    <span class="lf-dot"></span> SF-TRAINS.json</div>
+    </div>
+  </div>
+</div>
+
 <header>
   <div class="header-inner">
     <div class="brand">
@@ -434,28 +594,57 @@ function unwrap(j) {
 
 
 async function init() {
-  let loaded = 0;
   const total = MANIFEST.length;
+  let loaded = 0;
+
+  const barFill   = document.getElementById('loader-bar-fill');
+  const statusEl  = document.getElementById('loader-status');
+  const overlay   = document.getElementById('ir-loader');
+
+  function setProgress(n) {
+    barFill.style.width = `${Math.round((n / total) * 100)}%`;
+  }
+  function setFileState(id, state, count) {
+    const el = document.getElementById('lf-' + id);
+    if (!el) return;
+    el.classList.remove('active', 'done', 'fail');
+    el.classList.add(state);
+    if (state === 'done' && count !== undefined) {
+      el.innerHTML = `<span class="lf-dot"></span> ${MANIFEST.find(m=>m.id===id)?.file} <span style="color:#6B7280;margin-left:4px;">(${count.toLocaleString()})</span>`;
+    }
+    if (state === 'fail') {
+      el.innerHTML = `<span class="lf-dot"></span> ${MANIFEST.find(m=>m.id===id)?.file} <span style="color:#F87171;margin-left:4px;">— not found</span>`;
+    }
+  }
 
   for (const m of MANIFEST) {
+    setFileState(m.id, 'active');
+    statusEl.textContent = `Loading ${m.file}…`;
+
     try {
       const r = await fetch(m.file);
       if (!r.ok) throw new Error('404');
       db[m.id] = unwrap(await r.json());
+      setFileState(m.id, 'done', db[m.id].length);
       renderStatus(m, true, db[m.id].length);
     } catch {
+      setFileState(m.id, 'fail');
       renderStatus(m, false, 0);
     }
+
     loaded++;
-    document.getElementById('load-count').textContent = `${loaded} / ${total}`;
+    setProgress(loaded);
   }
 
-  // All done — update banner then fade out
-  const banner = document.getElementById('load-banner');
-  const msg = document.getElementById('load-msg');
-  msg.innerHTML = '✓ All data loaded. Ready to search.';
-  banner.style.background = '#065F46';  // green
-  setTimeout(() => banner.classList.add('hidden'), 1800);
+  // All done
+  statusEl.textContent = '✓ All files loaded. Ready to search.';
+  statusEl.style.color = '#34D399';
+  setProgress(total);
+
+  setTimeout(() => {
+    overlay.classList.add('fade-out');
+    setTimeout(() => overlay.remove(), 520);
+  }, 900);
 }
 
 
