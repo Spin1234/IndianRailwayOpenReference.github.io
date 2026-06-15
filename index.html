@@ -1499,12 +1499,12 @@ document.addEventListener('click', e => {
 
 // ── STATION SEARCH ──────────────────────────────────────────────────────────
 function execStationDirect(st) {
-  const q   = document.getElementById('sta-input').value.trim();
+  //const q   = document.getElementById('sta-input').value.trim();
   const out = document.getElementById('sta-out');
   out.innerHTML = '';
-  if (!q) return;
+  //if (!q) return;
 
-  const st = findStation(q);
+  //const st = findStation(q);
   if (!st) {
     //out.innerHTML = `<p class="err-msg">No station found for "${q}". Try a station code (e.g. HWH) or part of the name.</p>`;
     return;
