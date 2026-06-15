@@ -25,6 +25,62 @@
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: var(--bg-light); color: var(--text-dark); padding-bottom: 4rem; font-size: 14px; }
 
 
+/* ── Suggestion dropdown ── */
+.suggest-drop {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0; right: 0;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  z-index: 300;
+  max-height: 260px;
+  overflow-y: auto;
+  display: none;
+}
+.suggest-drop.open { display: block; }
+.suggest-item {
+  padding: 9px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #F3F4F6;
+  transition: background 0.1s;
+}
+.suggest-item:last-child { border-bottom: none; }
+.suggest-item:hover, .suggest-item.highlighted { background: #FFF8EC; }
+.suggest-code {
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--ir-blue);
+  background: #EFF3F8;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 2px 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.suggest-name {
+  font-size: 13px;
+  color: var(--text-dark);
+  font-weight: 500;
+}
+.suggest-meta {
+  font-size: 11px;
+  color: var(--muted);
+  margin-left: auto;
+  white-space: nowrap;
+}
+.suggest-empty {
+  padding: 10px 14px;
+  color: var(--muted);
+  font-size: 12px;
+  font-style: italic;
+}
+
 
 /* ── Full-screen loader overlay ── */
 #ir-loader {
@@ -563,13 +619,27 @@ tr:hover { background: #FFF8EC; }
 
   <!-- STATIONS -->
   <section id="page-stations" class="page">
-    <div class="card">
+    <!-- <div class="card">
       <h3>Station Explorer</h3>
       <div class="input-row">
         <input type="text" id="sta-input" placeholder="Station code or name (e.g. HWH, LTT, BDHL, Badhal)…" onkeydown="if(event.key==='Enter') execStation()">
         <button onclick="execStation()">Search</button>
       </div>
+    </div> -->
+
+    <div class="card">
+  <h3>Station Explorer</h3>
+  <div class="input-row" style="position:relative;">
+    <div style="flex:1;position:relative;">
+      <input type="text" id="sta-input" placeholder="Station code or name (e.g. HWH, LTT, BDHL, Angul)…"
+        onkeydown="if(event.key==='Enter'){selectStation();return;}"
+        oninput="showStationSuggestions(this.value)"
+        autocomplete="off">
+      <div id="sta-dropdown" class="suggest-drop"></div>
     </div>
+    <button onclick="selectStation()">Search</button>
+  </div>
+</div>
 
     <!-- ads -->
     <script>
@@ -1304,8 +1374,131 @@ function parseStopName(raw) {
   return {name:s, code:''};
 }
 
+
+
+// ── Station suggestion dropdown ──────────────────────────────────────────
+let selectedStation = null; // holds the chosen station object
+
+function showStationSuggestions(q) {
+  const drop = document.getElementById('sta-dropdown');
+  selectedStation = null;
+  q = q.trim();
+
+  if (q.length < 2) {
+    drop.innerHTML = '';
+    drop.classList.remove('open');
+    return;
+  }
+
+  const t = up(q);
+
+  // Score each station — exact code match gets highest priority
+  const scored = [];
+  for (const s of db.stations) {
+    const code = up(s.code || s.station_code || '');
+    const name = up(s.name || s.station_name || '');
+
+    let score = 0;
+    if (code === t) score = 100;                      // exact code match
+    else if (code.startsWith(t)) score = 80;          // code starts with query
+    else if (name.startsWith(t)) score = 60;          // name starts with query
+    else if (name.split(' ').some(w => w.startsWith(t))) score = 40; // word starts with query
+    else if (code.includes(t)) score = 20;            // code contains query
+    else if (name.includes(t)) score = 10;            // name contains query (lowest)
+
+    if (score > 0) scored.push({ s, score });
+  }
+
+  // Sort by score descending, then alphabetically
+  scored.sort((a, b) => b.score - a.score || 
+    (a.s.name || '').localeCompare(b.s.name || ''));
+
+  const top = scored.slice(0, 12); // show max 12 suggestions
+
+  if (top.length === 0) {
+    drop.innerHTML = `<div class="suggest-empty">No stations found for "${q}"</div>`;
+    drop.classList.add('open');
+    return;
+  }
+
+  drop.innerHTML = top.map((item, i) => {
+    const code = item.s.code || item.s.station_code || '';
+    const name = item.s.name || item.s.station_name || '';
+    const state = item.s.state || '';
+    return `<div class="suggest-item" 
+      onmousedown="pickStation(event, ${i})" 
+      data-idx="${i}">
+      <span class="suggest-code">${code}</span>
+      <span class="suggest-name">${name}</span>
+      ${state ? `<span class="suggest-meta">${state}</span>` : ''}
+    </div>`;
+  }).join('');
+
+  // Store top results so pickStation can reference them
+  drop._results = top.map(item => item.s);
+  drop.classList.add('open');
+}
+
+function pickStation(e, idx) {
+  e.preventDefault(); // prevent input blur before click registers
+  const drop = document.getElementById('sta-dropdown');
+  const st = drop._results[idx];
+  if (!st) return;
+
+  selectedStation = st;
+  const name = st.name || st.station_name || '';
+  const code = st.code || st.station_code || '';
+  document.getElementById('sta-input').value = `${name} (${code})`;
+  drop.classList.remove('open');
+  drop.innerHTML = '';
+
+  // Auto search immediately on pick
+  execStationDirect(st);
+}
+
+function selectStation() {
+  // If user picked from dropdown, already handled
+  // If user typed and pressed Search without picking, fall back to best match
+  if (selectedStation) {
+    execStationDirect(selectedStation);
+    return;
+  }
+  // Fallback: run a scored search and use top result
+  const q = document.getElementById('sta-input').value.trim();
+  if (!q) return;
+  const t = up(q);
+  let best = null, bestScore = 0;
+  for (const s of db.stations) {
+    const code = up(s.code || s.station_code || '');
+    const name = up(s.name || s.station_name || '');
+    let score = 0;
+    if (code === t) score = 100;
+    else if (code.startsWith(t)) score = 80;
+    else if (name.startsWith(t)) score = 60;
+    else if (name.split(' ').some(w => w.startsWith(t))) score = 40;
+    else if (code.includes(t)) score = 20;
+    else if (name.includes(t)) score = 10;
+    if (score > bestScore) { bestScore = score; best = s; }
+  }
+  if (best) execStationDirect(best);
+  else {
+    document.getElementById('sta-out').innerHTML =
+      `<p class="err-msg">No station found for "${q}".</p>`;
+  }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', e => {
+  const drop = document.getElementById('sta-dropdown');
+  if (drop && !drop.contains(e.target) && e.target.id !== 'sta-input') {
+    drop.classList.remove('open');
+  }
+});
+
+
+
 // ── STATION SEARCH ──────────────────────────────────────────────────────────
-function execStation() {
+function execStationDirect(st) {
   const q   = document.getElementById('sta-input').value.trim();
   const out = document.getElementById('sta-out');
   out.innerHTML = '';
@@ -1313,7 +1506,7 @@ function execStation() {
 
   const st = findStation(q);
   if (!st) {
-    out.innerHTML = `<p class="err-msg">No station found for "${q}". Try a station code (e.g. HWH) or part of the name.</p>`;
+    //out.innerHTML = `<p class="err-msg">No station found for "${q}". Try a station code (e.g. HWH) or part of the name.</p>`;
     return;
   }
 
