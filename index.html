@@ -23,7 +23,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
 
 
 /* ── Suggestion dropdown ── */
-.suggest-drop {
+/* .suggest-drop {
   position: absolute;
   top: calc(100% + 4px);
   left: 0; right: 0;
@@ -75,6 +75,68 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
   padding: 10px 14px;
   color: var(--muted);
   font-size: 12px;
+  font-style: italic;
+} */
+
+
+/* ── Search with suggestions ── */
+.search-wrap { position: relative; }
+
+.suggestion-box {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  max-height: 280px;
+  overflow-y: auto;
+  z-index: 500;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  display: none;
+}
+.suggestion-box.open { display: block; }
+
+.sug-item {
+  padding: 9px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #F3F4F6;
+  transition: background 0.1s;
+}
+.sug-item:last-child { border-bottom: none; }
+.sug-item:hover, .sug-item.active { background: #FFF8EC; }
+
+.sug-code {
+  font-family: monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ir-blue);
+  background: #EEF2F7;
+  padding: 2px 7px;
+  border-radius: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.sug-name {
+  font-size: 12.5px;
+  color: var(--text-dark);
+  font-weight: 500;
+}
+.sug-meta {
+  font-size: 10.5px;
+  color: var(--muted);
+  margin-left: auto;
+  white-space: nowrap;
+}
+.sug-empty {
+  padding: 12px 14px;
+  font-size: 12px;
+  color: var(--muted);
   font-style: italic;
 }
 
@@ -590,7 +652,7 @@ tr:hover { background: #FFF8EC; }
 
     <div class="card">
   <h3>Station Explorer</h3>
-  <div class="input-row" style="position:relative;">
+  <!-- <div class="input-row" style="position:relative;">
     <div style="flex:1;position:relative;">
       <input type="text" id="sta-input" style="width:100%" placeholder="Station code or name (e.g. HWH, LTT, BDHL, Angul)…"
         onkeydown="if(event.key==='Enter'){selectStation();return;}"
@@ -599,7 +661,18 @@ tr:hover { background: #FFF8EC; }
       <div id="sta-dropdown" class="suggest-drop"></div>
     </div>
     <button onclick="selectStation()">Search</button>
+  </div> -->
+      <div class="search-wrap">
+  <div class="input-row">
+    <input type="text" id="sta-input" 
+      placeholder="Station code or name (e.g. HWH, LTT, BDHL, Badhal)…"
+      onkeydown="if(event.key==='Enter') execStation()"
+      oninput="showStationSuggestions(this.value)"
+      autocomplete="off">
+    <button onclick="execStation()">Search</button>
   </div>
+  <div class="suggestion-box" id="sta-suggestions"></div>
+</div>
 </div>
     
     <div id="sta-out"></div>
@@ -610,10 +683,22 @@ tr:hover { background: #FFF8EC; }
   <section id="page-trains" class="page">
     <div class="card">
       <h3>Train Enquiry</h3>
-      <div class="input-row">
+      <!-- <div class="input-row">
         <input type="text" id="trn-input" placeholder="Train number or name (e.g. 01101, 01007, 47154, VALLEY QUEEN)…" onkeydown="if(event.key==='Enter') execTrain()">
         <button onclick="execTrain()">Search</button>
-      </div>
+      </div> -->
+
+      <div class="search-wrap">
+  <div class="input-row">
+    <input type="text" id="trn-input"
+      placeholder="Train number or name (e.g. 01101, 01007, 47154, VALLEY QUEEN)…"
+      onkeydown="if(event.key==='Enter') execTrain()"
+      oninput="showTrainSuggestions(this.value)"
+      autocomplete="off">
+    <button onclick="execTrain()">Search</button>
+  </div>
+  <div class="suggestion-box" id="trn-suggestions"></div>
+</div>
     </div>
     
     <div id="trn-out"></div>
@@ -1215,13 +1300,21 @@ function switchPage(id) {
 }
 
 // ── Look-ups ────────────────────────────────────────────────────────────────
+// function findStation(q) {
+//   const t = up(q);
+//   if (!t) return null;
+//   return db.stations.find(s=>
+//     up(s.code||s.station_code)===t ||
+//     up(s.name||s.station_name).includes(t)
+//   );
+// }
+
 function findStation(q) {
   const t = up(q);
   if (!t) return null;
-  return db.stations.find(s=>
-    up(s.code||s.station_code)===t ||
-    up(s.name||s.station_name).includes(t)
-  );
+  const byCode = db.stations.find(s => up(s.code||s.station_code) === t);
+  if (byCode) return byCode;
+  return db.stations.find(s => matchesStart(s.name||s.station_name||'', t));
 }
 
 function stationNameFor(code) {
@@ -1286,136 +1379,136 @@ function parseStopName(raw) {
 
 
 // ── Station suggestion dropdown ──────────────────────────────────────────
-let selectedStation = null; // holds the chosen station object
+// let selectedStation = null; // holds the chosen station object
 
-function showStationSuggestions(q) {
-  const drop = document.getElementById('sta-dropdown');
-  selectedStation = null;
-  q = q.trim();
+// function showStationSuggestions(q) {
+//   const drop = document.getElementById('sta-dropdown');
+//   selectedStation = null;
+//   q = q.trim();
 
-  if (q.length < 2) {
-    drop.innerHTML = '';
-    drop.classList.remove('open');
-    return;
-  }
+//   if (q.length < 2) {
+//     drop.innerHTML = '';
+//     drop.classList.remove('open');
+//     return;
+//   }
 
-  const t = up(q);
+//   const t = up(q);
 
-  // Score each station — exact code match gets highest priority
-  const scored = [];
-  for (const s of db.stations) {
-    const code = up(s.code || s.station_code || '');
-    const name = up(s.name || s.station_name || '');
+//   // Score each station — exact code match gets highest priority
+//   const scored = [];
+//   for (const s of db.stations) {
+//     const code = up(s.code || s.station_code || '');
+//     const name = up(s.name || s.station_name || '');
 
-    let score = 0;
-    if (code === t) score = 100;                      // exact code match
-    else if (code.startsWith(t)) score = 80;          // code starts with query
-    else if (name.startsWith(t)) score = 60;          // name starts with query
-    else if (name.split(' ').some(w => w.startsWith(t))) score = 40; // word starts with query
-    else if (code.includes(t)) score = 20;            // code contains query
-    else if (name.includes(t)) score = 10;            // name contains query (lowest)
+//     let score = 0;
+//     if (code === t) score = 100;                      // exact code match
+//     else if (code.startsWith(t)) score = 80;          // code starts with query
+//     else if (name.startsWith(t)) score = 60;          // name starts with query
+//     else if (name.split(' ').some(w => w.startsWith(t))) score = 40; // word starts with query
+//     else if (code.includes(t)) score = 20;            // code contains query
+//     else if (name.includes(t)) score = 10;            // name contains query (lowest)
 
-    if (score > 0) scored.push({ s, score });
-  }
+//     if (score > 0) scored.push({ s, score });
+//   }
 
-  // Sort by score descending, then alphabetically
-  scored.sort((a, b) => b.score - a.score || 
-    (a.s.name || '').localeCompare(b.s.name || ''));
+//   // Sort by score descending, then alphabetically
+//   scored.sort((a, b) => b.score - a.score || 
+//     (a.s.name || '').localeCompare(b.s.name || ''));
 
-  const top = scored.slice(0, 12); // show max 12 suggestions
+//   const top = scored.slice(0, 12); // show max 12 suggestions
 
-  if (top.length === 0) {
-    drop.innerHTML = `<div class="suggest-empty">No stations found for "${q}"</div>`;
-    drop.classList.add('open');
-    return;
-  }
+//   if (top.length === 0) {
+//     drop.innerHTML = `<div class="suggest-empty">No stations found for "${q}"</div>`;
+//     drop.classList.add('open');
+//     return;
+//   }
 
-  drop.innerHTML = top.map((item, i) => {
-    const code = item.s.code || item.s.station_code || '';
-    const name = item.s.name || item.s.station_name || '';
-    const state = item.s.state || '';
-    return `<div class="suggest-item" 
-      onmousedown="pickStation(event, ${i})" 
-      data-idx="${i}">
-      <span class="suggest-code">${code}</span>
-      <span class="suggest-name">${name}</span>
-      ${state ? `<span class="suggest-meta">${state}</span>` : ''}
-    </div>`;
-  }).join('');
+//   drop.innerHTML = top.map((item, i) => {
+//     const code = item.s.code || item.s.station_code || '';
+//     const name = item.s.name || item.s.station_name || '';
+//     const state = item.s.state || '';
+//     return `<div class="suggest-item" 
+//       onmousedown="pickStation(event, ${i})" 
+//       data-idx="${i}">
+//       <span class="suggest-code">${code}</span>
+//       <span class="suggest-name">${name}</span>
+//       ${state ? `<span class="suggest-meta">${state}</span>` : ''}
+//     </div>`;
+//   }).join('');
 
-  // Store top results so pickStation can reference them
-  drop._results = top.map(item => item.s);
-  drop.classList.add('open');
-}
+//   // Store top results so pickStation can reference them
+//   drop._results = top.map(item => item.s);
+//   drop.classList.add('open');
+// }
 
-function pickStation(e, idx) {
-  e.preventDefault(); // prevent input blur before click registers
-  const drop = document.getElementById('sta-dropdown');
-  const st = drop._results[idx];
-  if (!st) return;
+// function pickStation(e, idx) {
+//   e.preventDefault(); // prevent input blur before click registers
+//   const drop = document.getElementById('sta-dropdown');
+//   const st = drop._results[idx];
+//   if (!st) return;
 
-  selectedStation = st;
-  const name = st.name || st.station_name || '';
-  const code = st.code || st.station_code || '';
-  document.getElementById('sta-input').value = `${name} (${code})`;
-  drop.classList.remove('open');
-  drop.innerHTML = '';
+//   selectedStation = st;
+//   const name = st.name || st.station_name || '';
+//   const code = st.code || st.station_code || '';
+//   document.getElementById('sta-input').value = `${name} (${code})`;
+//   drop.classList.remove('open');
+//   drop.innerHTML = '';
 
-  // Auto search immediately on pick
-  execStationDirect(st);
-}
+//   // Auto search immediately on pick
+//   execStationDirect(st);
+// }
 
-function selectStation() {
-  // If user picked from dropdown, already handled
-  // If user typed and pressed Search without picking, fall back to best match
-  if (selectedStation) {
-    execStationDirect(selectedStation);
-    return;
-  }
-  // Fallback: run a scored search and use top result
-  const q = document.getElementById('sta-input').value.trim();
-  if (!q) return;
-  const t = up(q);
-  let best = null, bestScore = 0;
-  for (const s of db.stations) {
-    const code = up(s.code || s.station_code || '');
-    const name = up(s.name || s.station_name || '');
-    let score = 0;
-    if (code === t) score = 100;
-    else if (code.startsWith(t)) score = 80;
-    else if (name.startsWith(t)) score = 60;
-    else if (name.split(' ').some(w => w.startsWith(t))) score = 40;
-    else if (code.includes(t)) score = 20;
-    else if (name.includes(t)) score = 10;
-    if (score > bestScore) { bestScore = score; best = s; }
-  }
-  if (best) execStationDirect(best);
-  else {
-    document.getElementById('sta-out').innerHTML =
-      `<p class="err-msg">No station found for "${q}".</p>`;
-  }
-}
+// function selectStation() {
+//   // If user picked from dropdown, already handled
+//   // If user typed and pressed Search without picking, fall back to best match
+//   if (selectedStation) {
+//     execStationDirect(selectedStation);
+//     return;
+//   }
+//   // Fallback: run a scored search and use top result
+//   const q = document.getElementById('sta-input').value.trim();
+//   if (!q) return;
+//   const t = up(q);
+//   let best = null, bestScore = 0;
+//   for (const s of db.stations) {
+//     const code = up(s.code || s.station_code || '');
+//     const name = up(s.name || s.station_name || '');
+//     let score = 0;
+//     if (code === t) score = 100;
+//     else if (code.startsWith(t)) score = 80;
+//     else if (name.startsWith(t)) score = 60;
+//     else if (name.split(' ').some(w => w.startsWith(t))) score = 40;
+//     else if (code.includes(t)) score = 20;
+//     else if (name.includes(t)) score = 10;
+//     if (score > bestScore) { bestScore = score; best = s; }
+//   }
+//   if (best) execStationDirect(best);
+//   else {
+//     document.getElementById('sta-out').innerHTML =
+//       `<p class="err-msg">No station found for "${q}".</p>`;
+//   }
+// }
 
-// Close dropdown when clicking outside
-document.addEventListener('click', e => {
-  const drop = document.getElementById('sta-dropdown');
-  if (drop && !drop.contains(e.target) && e.target.id !== 'sta-input') {
-    drop.classList.remove('open');
-  }
-});
+// // Close dropdown when clicking outside
+// document.addEventListener('click', e => {
+//   const drop = document.getElementById('sta-dropdown');
+//   if (drop && !drop.contains(e.target) && e.target.id !== 'sta-input') {
+//     drop.classList.remove('open');
+//   }
+// });
 
 
 
 // ── STATION SEARCH ──────────────────────────────────────────────────────────
-function execStationDirect(st) {
-  //const q   = document.getElementById('sta-input').value.trim();
+function execStation() {
+  const q   = document.getElementById('sta-input').value.trim();
   const out = document.getElementById('sta-out');
   out.innerHTML = '';
-  //if (!q) return;
+  if (!q) return;
 
-  //const st = findStation(q);
+  const st = findStation(q);
   if (!st) {
-    //out.innerHTML = `<p class="err-msg">No station found for "${q}". Try a station code (e.g. HWH) or part of the name.</p>`;
+    out.innerHTML = `<p class="err-msg">No station found for "${q}". Try a station code (e.g. HWH) or part of the name.</p>`;
     return;
   }
 
@@ -1736,6 +1829,131 @@ function goTrain(num) {
   switchPage('trains');
   execTrain();
 }
+
+
+// ── SUGGESTION HELPERS ──────────────────────────────────────────────────────
+function matchesStart(haystack, needle) {
+  const h = String(haystack).toUpperCase();
+  const n = String(needle).toUpperCase().trim();
+  if (!n) return false;
+  if (h.startsWith(n)) return true;
+  return h.split(/[\s\-\/]+/).some(word => word.startsWith(n));
+}
+
+function showStationSuggestions(val) {
+  const box = document.getElementById('sta-suggestions');
+  const q   = val.trim();
+  if (q.length < 2) { box.innerHTML=''; box.classList.remove('open'); return; }
+
+  const t = q.toUpperCase();
+  const results = [];
+
+  for (const s of db.stations) {
+    const code  = (s.code||s.station_code||'').trim().toUpperCase();
+    const name  = (s.name||s.station_name||'').trim();
+    const state = (s.state||'').trim();
+    const codeMatch = code.startsWith(t);
+    const nameMatch = matchesStart(name, t);
+    if (codeMatch || nameMatch) {
+      results.push({ code, name, state, _codeMatch: codeMatch });
+      if (results.length >= 12) break;
+    }
+  }
+
+  results.sort((a,b) => {
+    if (a._codeMatch && !b._codeMatch) return -1;
+    if (!a._codeMatch && b._codeMatch) return 1;
+    return a.name.localeCompare(b.name);
+  });
+
+  if (results.length === 0) {
+    box.innerHTML = `<div class="sug-empty">No stations found for "${q}"</div>`;
+    box.classList.add('open');
+    return;
+  }
+
+  box.innerHTML = results.map(r => `
+    <div class="sug-item" onclick="selectStation('${r.code}')">
+      <span class="sug-code">${r.code}</span>
+      <span class="sug-name">${r.name}</span>
+      <span class="sug-meta">${r.state}</span>
+    </div>`).join('');
+  box.classList.add('open');
+}
+
+function selectStation(code) {
+  document.getElementById('sta-input').value = code;
+  document.getElementById('sta-suggestions').classList.remove('open');
+  execStation();
+}
+
+function showTrainSuggestions(val) {
+  const box = document.getElementById('trn-suggestions');
+  const q   = val.trim();
+  if (q.length < 2) { box.innerHTML=''; box.classList.remove('open'); return; }
+
+  const t = q.toUpperCase();
+  const isNum = /^\d/.test(t);
+  const results = [];
+  const seen = new Set();
+
+  const pools = [db.trainsSf, db.trainsExp, db.trainsPass, db.trainsMaster];
+  for (const pool of pools) {
+    for (const item of pool) {
+      const num  = (item.trainNumber||item.number||item.train_number||'').toString().toUpperCase();
+      const name = (item.trainName||item.name||'');
+      const key  = num || name.toUpperCase();
+      if (seen.has(key)) continue;
+      const numMatch  = num.startsWith(t);
+      const nameMatch = !isNum && matchesStart(name, t);
+      if (numMatch || nameMatch) {
+        seen.add(key);
+        results.push({
+          num,
+          name,
+          route: item.route||`${item.from_station_name||''} → ${item.to_station_name||''}`,
+          _numMatch: numMatch
+        });
+        if (results.length >= 12) break;
+      }
+    }
+    if (results.length >= 12) break;
+  }
+
+  results.sort((a,b) => {
+    if (a._numMatch && !b._numMatch) return -1;
+    if (!a._numMatch && b._numMatch) return 1;
+    return a.num.localeCompare(b.num);
+  });
+
+  if (results.length === 0) {
+    box.innerHTML = `<div class="sug-empty">No trains found for "${q}"</div>`;
+    box.classList.add('open');
+    return;
+  }
+
+  box.innerHTML = results.map(r => `
+    <div class="sug-item" onclick="selectTrain('${r.num}')">
+      <span class="sug-code">${r.num}</span>
+      <span class="sug-name">${r.name}</span>
+      <span class="sug-meta" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;">${r.route}</span>
+    </div>`).join('');
+  box.classList.add('open');
+}
+
+function selectTrain(num) {
+  document.getElementById('trn-input').value = num;
+  document.getElementById('trn-suggestions').classList.remove('open');
+  execTrain();
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', e => {
+  if (!e.target.closest('.search-wrap')) {
+    document.querySelectorAll('.suggestion-box').forEach(b => b.classList.remove('open'));
+  }
+});
+
 
 window.addEventListener('DOMContentLoaded', init);
 
