@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog — Indian Railways Articles &amp; Guides | Indian Railway Train Enquiry</title>
+<meta name="description" content="Browse our collection of in-depth articles on Indian Railways — locomotives, coaches, premium trains, stations, and more for railfans and travelers.">
+<style>
+:root {
+  --ir-blue: #0A2240;
+  --ir-orange: #FB8C00;
+  --ir-gold: #FFC72C;
+  --bg-light: #EFF3F8;
+  --text-dark: #111827;
+  --border: #D1D5DB;
+  --white: #FFFFFF;
+  --muted: #6B7280;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: var(--bg-light); color: var(--text-dark); padding-bottom: 4rem; font-size: 14px; }
+
+header { background: var(--white); padding: 0.9rem 1.5rem; border-bottom: 4px solid var(--ir-orange); }
+.header-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand-text h1 { font-size: 1.3rem; color: var(--ir-blue); font-weight: 800; }
+.brand-text p { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+nav { background: var(--ir-blue); }
+.nav-inner { max-width: 1100px; margin: 0 auto; display: flex; overflow-x: auto; }
+nav a { background: none; border: none; color: #C9D4E0; padding: 13px 18px; cursor: pointer; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.5px; text-decoration: none; white-space: nowrap; border-bottom: 3px solid transparent; }
+nav a:hover { color: #fff; background: rgba(255,255,255,0.07); }
+nav a.active { color: var(--ir-gold); border-bottom-color: var(--ir-gold); }
+
+main { max-width: 1100px; margin: 0 auto; padding: 0 1.2rem; }
+
+.blog-hero { background: linear-gradient(135deg, var(--ir-blue), #123461); border-radius: 8px; padding: 2rem 1.6rem; color: #fff; margin: 1.4rem 0; }
+.blog-hero h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: 8px; }
+.blog-hero p { font-size: 13px; color: #C9D4E0; max-width: 600px; line-height:1.6; }
+
+.post-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; margin-bottom: 2rem; }
+
+.post-card { background: var(--white); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; transition: box-shadow 0.15s, transform 0.15s; }
+.post-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
+.post-card a.cover-link { display:block; text-decoration:none; }
+.post-card .cover { width: 100%; height: 160px; object-fit: cover; display: block; background: #EEF2F7; }
+.post-card .post-body { padding: 14px 16px; flex: 1; display: flex; flex-direction: column; }
+.post-card .post-tag { display: inline-block; background: #FFF3E0; color: var(--ir-orange); font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px; width: fit-content; }
+.post-card h3 { font-size: 1.02rem; color: var(--ir-blue); font-weight: 800; line-height: 1.35; margin-bottom: 7px; }
+.post-card h3 a { color: inherit; text-decoration: none; }
+.post-card h3 a:hover { text-decoration: underline; }
+.post-card p.excerpt { font-size: 12.5px; color: #374151; line-height: 1.6; flex: 1; margin-bottom: 10px; }
+.post-card .post-meta { font-size: 11px; color: var(--muted); display: flex; gap: 12px; padding-top: 10px; border-top: 1px solid #F0F0F0; }
+.post-card .read-more { display: inline-block; margin-top: 10px; color: var(--ir-blue); font-weight: 700; font-size: 12px; text-decoration: none; }
+.post-card .read-more:hover { text-decoration: underline; }
+
+.empty-note { background: var(--white); border: 1px dashed var(--border); border-radius: 6px; padding: 2rem; text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 2rem; }
+
+footer { text-align:center; padding:1.5rem; font-size:12px; color:#6B7280; border-top:1px solid var(--border); margin-top:2rem; }
+footer a { color: var(--ir-blue); text-decoration: none; font-weight: 600; }
+footer a:hover { text-decoration: underline; }
+
+@media (max-width:640px) {
+  .blog-hero { padding: 1.4rem 1.1rem; }
+  .blog-hero h2 { font-size: 1.25rem; }
+  .post-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <img src="IR.png" alt="Indian Railways Logo" style="width:42px;height:42px;object-fit:contain;">
+      <div class="brand-text">
+        <h1>Indian Railways</h1>
+        <p>Train &amp; Station Enquiry Reference Portal</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html">Overview</a>
+    <a href="index.html">Station Explorer</a>
+    <a href="index.html">Train Enquiry</a>
+    <a href="blog.html" class="active">Blog</a>
+  </div>
+</nav>
+
+<main>
+  <div class="blog-hero">
+    <h2>Indian Railways Blog</h2>
+    <p>In-depth guides, locomotive breakdowns, train reviews, and everything else for railfans and travelers — written for anyone who loves Indian Railways.</p>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       POST GRID — add a new .post-card block for each new
+       blog post you publish. Copy/paste the block below and
+       update the href, image, tag, title, excerpt, and date.
+  ════════════════════════════════════════════════════ -->
+  <div class="post-grid" id="post-grid">
+
+    <!-- POST 1 -->
+    <div class="post-card">
+      <a class="cover-link" href="indian-railways-complete-guide.html">
+        <img class="cover" src="https://commons.wikimedia.org/wiki/Special:FilePath/Side%20view%20of%20a%20WAP%207%20class%20Locomotive%20of%20Indian%20Railways.jpg?width=600" alt="WAP-7 locomotive of Indian Railways" loading="lazy">
+      </a>
+      <div class="post-body">
+        <span class="post-tag">Complete Guide</span>
+        <h3><a href="indian-railways-complete-guide.html">Indian Railways Complete Guide 2026: Locomotives, Coaches, Trains &amp; Stations</a></h3>
+        <p class="excerpt">Every WAP and WAG locomotive class, coach types explained, fare structure, premium trains like Vande Bharat and Rajdhani, station facilities, and a full railfan glossary — all in one page.</p>
+        <a class="read-more" href="indian-railways-complete-guide.html">Read Article →</a>
+        <div class="post-meta">
+          <span>📅 June 2026</span>
+          <span>⏱️ 18 min read</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD NEW POSTS HERE — copy the block above, change the content -->
+
+  </div>
+
+</main>
+
+<footer>
+  <a href="index.html">Home</a> &nbsp;·&nbsp;
+  <a href="about.html">About</a> &nbsp;·&nbsp;
+  <a href="blog.html">Blog</a> &nbsp;·&nbsp;
+  <a href="privacy.html">Privacy Policy</a> &nbsp;·&nbsp;
+  <a href="contact.html">Contact</a>
+  <br><br>
+  © 2026 Indian Railways Train Enquiry Portal. Unofficial reference site. Not affiliated with Indian Railways or IRCTC.
+  <br>
+  Designed &amp; Developed by <strong style="color:var(--ir-blue);">Your Name</strong>
+</footer>
+
+</body>
+</html>
